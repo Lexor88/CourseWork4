@@ -1,9 +1,3 @@
-import json
-import pathlib
-
-from config import ROOT_DIR
-
-
 class Vacancy:
     """Класс Vacancy, для работы с вакансиями (выгруженными из того или иного
     места)"""

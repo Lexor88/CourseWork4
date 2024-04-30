@@ -4,6 +4,10 @@ from src.fileworker import FileWorker
 
 
 class JSONWorker(FileWorker):
+    """
+    Класс предназначенный для работы с файлами(имеет методы для выгрузки из файла, а так же
+    для записи, добавления и удаления вакансий)
+    """
     def __init__(self, path):
         self.path = path
 
