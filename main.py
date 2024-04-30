@@ -10,8 +10,8 @@ from src.vacancy import Vacancy
 def main():
     search_query = input("Введите поисковый запрос: ")
     top_n = int(input("Введите количество вакансий для вывода в топ N: "))
-    filter_words = input("Введите ключевые слова для фильтрации вакансий: ").split()
-    salary_range = input("Введите нижний порог зарплаты: ")
+    filter_words = input("Введите ключевые слова для фильтрации вакансий: ").split(' ')
+    salary_range = int(input("Введите нижний порог зарплаты: "))
     hh_api = HeadHunterAPI()
     hh_vacancies = hh_api.load_vacancies(search_query)
     vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
