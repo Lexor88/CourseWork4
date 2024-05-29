@@ -1,31 +1,43 @@
 import pathlib
 from config import ROOT_DIR
+from src.dbmanager import DBManager
 from src.headhunterapi import HeadHunterAPI
 from src.jsonworker import JSONWorker
 from src.utils import (filter_vacancies, get_vacancies_by_salary,
-                       sort_vacancies, get_top_vacancies, print_vacancies)
+                       sort_vacancies, get_top_vacancies, print_vacancies, add_data_to_db)
 from src.vacancy import Vacancy
 
 
 def main():
-    search_query = input("Введите поисковый запрос: ")
-    top_n = int(input("Введите количество вакансий для вывода в топ N: "))
-    filter_words = input("Введите ключевые слова для фильтрации вакансий: ").split(' ')
-    salary_range = int(input("Введите нижний порог зарплаты: "))
-    hh_api = HeadHunterAPI()
-    hh_vacancies = hh_api.load_vacancies(search_query)
-    vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
-    filtered_vacancies = filter_vacancies(vacancies_list, filter_words)
-
-    ranged_vacancies = get_vacancies_by_salary(filtered_vacancies, salary_range)
-
-    sorted_vacancies = sort_vacancies(ranged_vacancies)
-    top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
-    print_vacancies(top_vacancies)
-    file_name = input("Введите название файла, в который желаете произвести сохранение")
-    file_path = pathlib.Path.joinpath(ROOT_DIR, 'data', file_name + '.json')
-    json_saver = JSONWorker(file_path)
-    json_saver.write_vacancies(top_vacancies)
+    user_input = input("Желаете обновить базу данных? yes/no")
+    if user_input == 'yes':
+        add_data_to_db()
+    user_input = input("Какой запрос желаете направить в БД\n"
+                       "1 - получить список всех компаний и количество вакансий у каждой компании\n"
+                       "2 - получить список всех вакансий с указанием названия компании, названия "
+                       "вакансии и зарплаты и ссылки на вакансию\n"
+                       "3 - получить среднюю зарплату по вакансиям\n"
+                       "4 - получить список всех вакансий, у которых зарплата выше средней по всем вакансиям\n"
+                       "5 - получить список всех вакансий, в названии которых содержатся переданные в метод слова, "
+                       "например python.\n")
+    dbmanager = DBManager()
+    if user_input == '1':
+        for i in dbmanager.get_companies_and_vacancies_count():
+            print(i)
+    elif user_input == '2':
+        for i in dbmanager.get_all_vacancies():
+            print(i)
+    elif user_input == '3':
+            print(dbmanager.get_avg_salary())
+    elif user_input == '4':
+        for i in dbmanager.get_vacancies_with_higher_salary():
+            print(i)
+    elif user_input == '5':
+        search_query = input("Введите поисковый запрос: ")
+        for i in dbmanager.get_vacancies_with_keyword(search_query):
+            print(i)
+    else:
+        print('Команда не была распознана')
 
 
 if __name__ == "__main__":
